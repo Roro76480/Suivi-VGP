@@ -1,9 +1,16 @@
-import { Bell, User } from 'lucide-react';
+import { Bell, User, Menu } from 'lucide-react';
+import PropTypes from 'prop-types';
 
-const Header = () => {
+const Header = ({ toggleMenu }) => {
     return (
         <header className="flex items-center justify-between px-6 py-4 bg-white shadow-sm">
             <div className="flex items-center">
+                <button
+                    className="mr-4 md:hidden text-gray-500 hover:text-blue-600 focus:outline-none"
+                    onClick={toggleMenu}
+                >
+                    <Menu className="w-6 h-6" />
+                </button>
                 <h2 className="text-xl font-semibold text-gray-800">
                     Tableau de bord
                 </h2>
@@ -24,3 +31,7 @@ const Header = () => {
 };
 
 export default Header;
+
+Header.propTypes = {
+    toggleMenu: PropTypes.func.isRequired,
+};
