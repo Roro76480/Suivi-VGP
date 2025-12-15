@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend-node
+    container_name: suivivgp-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      # Attention aux variables sensibles, à définir dans un .env sur le serveur
+      - BASEROW_API_URL=${BASEROW_API_URL}
+      - BASEROW_TOKEN=${BASEROW_TOKEN}
+      - BASEROW_DATABASE_ID=${BASEROW_DATABASE_ID}
+      - BASEROW_TABLE_ID=${BASEROW_TABLE_ID}
+      - CORS_ORIGIN=*
+    volumes:
+      - uploads_data:/app/uploads
+
+  frontend:
+    build: ./react-app
+    container_name: suivivgp-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  uploads_data:
