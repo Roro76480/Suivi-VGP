@@ -1,0 +1,7 @@
+vgp.evolia-digital.fr {
+    # 1. API Backend : rediriger tout ce qui commence par /api vers le conteneur backend
+    reverse_proxy /api/* backend:5000
+
+    # 2. Frontend : rediriger le reste vers le conteneur frontend
+    reverse_proxy * frontend:80
+}

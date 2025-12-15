@@ -5,6 +5,12 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+
+# Réceptionner l'argument de build
+ARG VITE_API_URL
+# Le définir comme variable d'environnement pour le build Vite
+ENV VITE_API_URL=$VITE_API_URL
+
 # La commande build génère les fichiers dans /app/dist
 RUN npm run build
 
