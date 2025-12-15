@@ -8,9 +8,9 @@ services:
     environment:
       - PORT=5000
       - BASEROW_API_URL=${BASEROW_API_URL}
-      - BASEROW_TOKEN=${BASEROW_TOKEN}
-      - BASEROW_DATABASE_ID=${BASEROW_DATABASE_ID}
-      - BASEROW_TABLE_ID=${BASEROW_TABLE_ID}
+      - BASEROW_API_TOKEN=${BASEROW_API_TOKEN}
+      - BASEROW_DATABASE_ID=${BASEROW_DB_ID}
+      - BASEROW_TABLE_ENGINS_ID=${BASEROW_TABLE_ENGINS}
       - CORS_ORIGIN=*
     volumes:
       - uploads_data:/app/uploads
