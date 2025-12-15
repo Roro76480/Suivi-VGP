@@ -1,5 +1,4 @@
 import { Bell, User, Menu } from 'lucide-react';
-import PropTypes from 'prop-types';
 
 const Header = ({ toggleMenu }) => {
     return (
@@ -31,7 +30,3 @@ const Header = ({ toggleMenu }) => {
 };
 
 export default Header;
-
-Header.propTypes = {
-    toggleMenu: PropTypes.func.isRequired,
-};

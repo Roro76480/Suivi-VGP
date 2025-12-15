@@ -1,6 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Truck, Settings, FileText, X } from 'lucide-react';
-import PropTypes from 'prop-types';
 
 const Sidebar = ({ isOpen, closeMenu }) => {
     const location = useLocation();
@@ -58,11 +57,6 @@ const Sidebar = ({ isOpen, closeMenu }) => {
             </aside>
         </>
     );
-};
-
-Sidebar.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
-    closeMenu: PropTypes.func.isRequired,
 };
 
 export default Sidebar;
