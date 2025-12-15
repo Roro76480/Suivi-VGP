@@ -32,7 +32,7 @@ services:
       context: ./react-app
       args:
         # L'API est sur le même domaine, donc chemin relatif
-        VITE_API_URL: /api
+        VITE_API_URL: https://vgp.evolia-digital.fr/api
     container_name: suivivgp-frontend
     restart: always
     depends_on:
