@@ -147,7 +147,26 @@ const EnginsController = {
 
     // Méthodes placeholder pour éviter le crash des routes existantes
     createEngin: async (req, res) => {
-        res.status(501).json({ message: "Not implemented yet" });
+        try {
+            console.log(`[CREATE] Request new Engin:`, req.body);
+            // Nettoyage basique: s'assurer que les tableaux sont bien des tableaux si vides
+            const payload = { ...req.body };
+
+            // Si Photo ou Rapport VGP sont vides/null, on préfère souvent [] pour Baserow Files
+            if (!payload['Photo']) payload['Photo'] = [];
+            if (!payload['Rapport VGP']) payload['Rapport VGP'] = [];
+            if (!payload['Notes']) payload['Notes'] = "";
+
+            const result = await BaserowService.createRow(TABLE_ENGINS_ID, payload);
+            res.status(201).json(result);
+        } catch (error) {
+            console.error(`[CREATE ERROR]`, error.message);
+            if (error.response) {
+                console.error("[BASEROW ERROR DETAILS]", error.response.data);
+                return res.status(error.response.status).json(error.response.data);
+            }
+            res.status(500).json({ message: "Erreur création engin", error: error.message });
+        }
     },
 
     triggerValidationVGP: async (req, res) => {
