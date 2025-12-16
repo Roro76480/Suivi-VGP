@@ -106,7 +106,9 @@ const GestionVGP = () => {
                 'Due Date': formData['Due Date'],
                 'Rapport VGP': formData['Rapport VGP'],
                 Photo: formData.Photo,
-                Note: formData.Note, // Ajout du champ Note
+                // Correction : Baserow utilise souvent 'Notes' au pluriel. On envoie les deux par sécurité ou on cible Notes.
+                Notes: formData.Note,
+                Note: formData.Note
                 // 'Document': formData.Document // Ajouter si colonne existe
             };
 
@@ -123,12 +125,22 @@ const GestionVGP = () => {
             loadEngins(); // Reload list
             if (isCreating) {
                 setIsCreating(false);
-                setFormData({ Name: '', Statut: '', 'Due Date': '', 'Rapport VGP': [], Photo: [] });
+                setFormData({ Name: '', Statut: '', 'Due Date': '', 'Rapport VGP': [], Photo: [], Note: '' });
             }
         } catch (err) {
             console.error(err);
             setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde.' });
         }
+    };
+
+    // Helper pour la couleur du statut
+    const getStatusColor = (status) => {
+        if (!status) return 'text-gray-500';
+        const s = status.toLowerCase();
+        if (s.includes('renouvellement')) return 'text-orange-600';
+        if (s.includes('écart')) return 'text-red-600';
+        if (s.includes('validité') || s.includes('cours')) return 'text-green-600';
+        return 'text-gray-500';
     };
 
     return (
@@ -187,35 +199,45 @@ const GestionVGP = () => {
                         <div className="mt-2 absolute z-10 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
                             {engins.filter(e => {
                                 const status = typeof e.Statut === 'object' ? e.Statut?.value : e.Statut;
+                                const statusStr = String(status || "");
                                 const matchName = e.Name.toLowerCase().includes(searchTerm.toLowerCase());
-                                const matchStatus = status === "Prévoir le renouvellement";
+
+                                // Filtre élargi : Renouvellement, Écarts, Validité
+                                const allowedStatuses = ["Prévoir le renouvellement", "Avec écarts", "Validité VGP en cours"];
+                                const matchStatus = allowedStatuses.includes(statusStr);
+
                                 return matchName && matchStatus;
                             }).length > 0 ? (
                                 engins
                                     .filter(e => {
                                         const status = typeof e.Statut === 'object' ? e.Statut?.value : e.Statut;
+                                        const statusStr = String(status || "");
                                         const matchName = e.Name.toLowerCase().includes(searchTerm.toLowerCase());
-                                        const matchStatus = status === "Prévoir le renouvellement";
+                                        const allowedStatuses = ["Prévoir le renouvellement", "Avec écarts", "Validité VGP en cours"];
+                                        const matchStatus = allowedStatuses.includes(statusStr);
                                         return matchName && matchStatus;
                                     })
-                                    .map(e => (
-                                        <div
-                                            key={e.id}
-                                            className="cursor-pointer select-none relative py-3 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50 last:border-0"
-                                            onClick={() => {
-                                                handleSelectEngin(e.id.toString());
-                                                setSearchTerm('');
-                                            }}
-                                        >
-                                            <span className="block truncate font-medium">{e.Name}</span>
-                                            <span className="block truncate text-xs text-orange-600 font-medium">
-                                                {typeof e.Statut === 'object' ? e.Statut?.value : e.Statut}
-                                            </span>
-                                        </div>
-                                    ))
+                                    .map(e => {
+                                        const status = typeof e.Statut === 'object' ? e.Statut?.value : e.Statut;
+                                        return (
+                                            <div
+                                                key={e.id}
+                                                className="cursor-pointer select-none relative py-3 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50 last:border-0"
+                                                onClick={() => {
+                                                    handleSelectEngin(e.id.toString());
+                                                    setSearchTerm('');
+                                                }}
+                                            >
+                                                <span className="block truncate font-medium">{e.Name}</span>
+                                                <span className={`block truncate text-xs font-medium ${getStatusColor(status)}`}>
+                                                    {status}
+                                                </span>
+                                            </div>
+                                        );
+                                    })
                             ) : (
                                 <div className="cursor-default select-none relative py-2 pl-3 pr-9 text-gray-700">
-                                    Aucun engin à renouveler trouvé pour "{searchTerm}"
+                                    Aucun engin correspondant trouvé pour "{searchTerm}"
                                 </div>
                             )}
                         </div>
