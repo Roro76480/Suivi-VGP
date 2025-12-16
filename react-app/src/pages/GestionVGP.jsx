@@ -7,6 +7,7 @@ const GestionVGP = () => {
     const [selectedEngin, setSelectedEngin] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
     const [message, setMessage] = useState(null); // { type: 'success'|'error', text: '' }
+    const [searchTerm, setSearchTerm] = useState(''); // Pour la barre de recherche
 
     // États du formulaire
     const [formData, setFormData] = useState({
@@ -134,28 +135,90 @@ const GestionVGP = () => {
         <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold mb-8 text-gray-800">Gestion / Suivi VGP</h1>
 
-            {/* Sélection */}
+            {/* Sélection avec Recherche */}
             <div className="mb-8 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Sélectionner un engin à modifier</label>
-                <div className="flex gap-4">
-                    <select
-                        className="block w-full rounded-lg border-gray-300 bg-gray-50 p-3 focus:border-blue-500 focus:ring-blue-500 shadow-sm transition-all"
-                        onChange={(e) => handleSelectEngin(e.target.value)}
-                        value={isCreating ? 'new' : (selectedEngin?.id || '')}
-                    >
-                        <option value="">-- Choisir un engin --</option>
-                        <option value="new">+ Ajouter un nouvel engin</option>
-                        {engins.map(e => (
-                            <option key={e.id} value={e.id}>{e.Name}</option>
-                        ))}
-                    </select>
-                    {isCreating && (
+                <label className="block text-sm font-medium text-gray-700 mb-2">Rechercher un engin à modifier</label>
+                <div className="relative">
+                    <div className="flex gap-4">
+                        <div className="relative w-full">
+                            <input
+                                type="text"
+                                placeholder="Tapez pour rechercher un engin..."
+                                className="block w-full rounded-lg border-gray-300 bg-gray-50 p-3 pl-10 focus:border-blue-500 focus:ring-blue-500 shadow-sm transition-all outline-none"
+                                value={isCreating ? "" : (selectedEngin ? selectedEngin.Name : searchTerm)}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    if (selectedEngin) {
+                                        setSelectedEngin(null); // Reset selection if typing
+                                    }
+                                    if (isCreating) setIsCreating(false);
+                                }}
+                                onClick={() => {
+                                    // Quand on clique sur l'input, si un engin est sélectionné, on efface pour permettre une nouvelle recherche
+                                    if (selectedEngin) {
+                                        setSearchTerm('');
+                                        setSelectedEngin(null);
+                                    }
+                                }}
+                            />
+                            {/* Search Icon */}
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                        </div>
+
                         <button
-                            onClick={() => setIsCreating(false)}
-                            className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg whitespace-nowrap"
+                            onClick={() => {
+                                setIsCreating(true);
+                                setSelectedEngin(null);
+                                setSearchTerm('');
+                            }}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg whitespace-nowrap flex items-center shadow-sm transition-colors"
                         >
-                            Annuler création
+                            <Plus className="w-4 h-4 mr-2" />
+                            Nouvel Engin
                         </button>
+                    </div>
+
+                    {/* Liste des résultats filtrée */}
+                    {!selectedEngin && !isCreating && (
+                        <div className="mt-2 absolute z-10 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                            {engins.filter(e => {
+                                const status = typeof e.Statut === 'object' ? e.Statut?.value : e.Statut;
+                                const matchName = e.Name.toLowerCase().includes(searchTerm.toLowerCase());
+                                const matchStatus = status === "Prévoir le renouvellement";
+                                return matchName && matchStatus;
+                            }).length > 0 ? (
+                                engins
+                                    .filter(e => {
+                                        const status = typeof e.Statut === 'object' ? e.Statut?.value : e.Statut;
+                                        const matchName = e.Name.toLowerCase().includes(searchTerm.toLowerCase());
+                                        const matchStatus = status === "Prévoir le renouvellement";
+                                        return matchName && matchStatus;
+                                    })
+                                    .map(e => (
+                                        <div
+                                            key={e.id}
+                                            className="cursor-pointer select-none relative py-3 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50 last:border-0"
+                                            onClick={() => {
+                                                handleSelectEngin(e.id.toString());
+                                                setSearchTerm('');
+                                            }}
+                                        >
+                                            <span className="block truncate font-medium">{e.Name}</span>
+                                            <span className="block truncate text-xs text-orange-600 font-medium">
+                                                {typeof e.Statut === 'object' ? e.Statut?.value : e.Statut}
+                                            </span>
+                                        </div>
+                                    ))
+                            ) : (
+                                <div className="cursor-default select-none relative py-2 pl-3 pr-9 text-gray-700">
+                                    Aucun engin à renouveler trouvé pour "{searchTerm}"
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>
@@ -173,6 +236,13 @@ const GestionVGP = () => {
                                 {message.text}
                             </div>
                         )}
+                        <button
+                            type="button"
+                            onClick={() => { setSelectedEngin(null); setIsCreating(false); }}
+                            className="text-gray-400 hover:text-gray-600 ml-4"
+                        >
+                            Fermer
+                        </button>
                     </div>
 
                     <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -190,9 +260,9 @@ const GestionVGP = () => {
                             />
                         </div>
 
-                        {/* Statut */}
+                        {/* Statut Dynamique */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Statut (Synchronisé BDD)</label>
                             <select
                                 name="Statut"
                                 value={formData.Statut}
@@ -200,11 +270,16 @@ const GestionVGP = () => {
                                 className="w-full rounded-lg border-gray-300 p-3 bg-white focus:ring-2 focus:ring-blue-500 border outline-none"
                             >
                                 <option value="">Sélectionner...</option>
-                                <option value="En service">En service</option>
-                                <option value="En maintenance">En maintenance</option>
-                                <option value="Hors service">Hors service</option>
-                                <option value="Archivée">Archivée</option>
+                                {/* Extraction dynamique des statuts uniques présents dans la liste des engins chargés */}
+                                {[...new Set(engins.map(e => typeof e.Statut === 'object' ? e.Statut?.value : e.Statut).filter(Boolean))].sort().map(status => (
+                                    <option key={status} value={status}>{status}</option>
+                                ))}
+                                {/* Fallback options si la liste est vide ou incomplète */}
+                                {!engins.some(e => (typeof e.Statut === 'object' ? e.Statut?.value : e.Statut) === "Prévoir le renouvellement") && <option value="Prévoir le renouvellement">Prévoir le renouvellement</option>}
+                                {!engins.some(e => (typeof e.Statut === 'object' ? e.Statut?.value : e.Statut) === "Validité VGP en cours") && <option value="Validité VGP en cours">Validité VGP en cours</option>}
+                                {!engins.some(e => (typeof e.Statut === 'object' ? e.Statut?.value : e.Statut) === "Avec écarts") && <option value="Avec écarts">Avec écarts</option>}
                             </select>
+                            <p className="text-xs text-gray-500 mt-1">Options récupérées directement de vos engins existants.</p>
                         </div>
 
                         {/* Due Date */}
