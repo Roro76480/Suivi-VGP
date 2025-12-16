@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getEngins, api } from '../services/api'; // Assurez-vous d'exporter api ou d'avoir updateEngin/uploadFile
-import { Save, Upload, Plus, AlertCircle, Check } from 'lucide-react';
+import { Save, Upload, Plus, AlertCircle, Check, Trash } from 'lucide-react';
 
 const GestionVGP = () => {
     const [engins, setEngins] = useState([]);
@@ -141,6 +141,25 @@ const GestionVGP = () => {
         if (s.includes('écart')) return 'text-red-600';
         if (s.includes('validité') || s.includes('cours')) return 'text-green-600';
         return 'text-gray-500';
+    };
+
+    const handleDelete = async () => {
+        if (!selectedEngin) return;
+
+        if (window.confirm(`Êtes-vous sûr de vouloir supprimer définitivement l'engin "${selectedEngin.Name}" ? Cette action est irréversible.`)) {
+            try {
+                setMessage({ type: 'info', text: 'Suppression en cours...' });
+                await api.delete(`/engins/${selectedEngin.id}`);
+
+                setMessage({ type: 'success', text: 'Engin supprimé avec succès.' });
+                setSelectedEngin(null);
+                setFormData({ Name: '', Statut: '', 'Due Date': '', 'Rapport VGP': [], Photo: [], Note: '' });
+                loadEngins(); // Recharger la liste
+            } catch (err) {
+                console.error(err);
+                setMessage({ type: 'error', text: 'Erreur lors de la suppression.' });
+            }
+        }
     };
 
     return (
@@ -361,7 +380,21 @@ const GestionVGP = () => {
                         </div>
                     </div>
 
-                    <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end">
+                    <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
+                        {/* Zone suppression (ne s'affiche que si on modifie un engin existant) */}
+                        <div>
+                            {!isCreating && selectedEngin && (
+                                <button
+                                    type="button"
+                                    onClick={handleDelete}
+                                    className="flex items-center text-red-500 hover:text-red-700 text-sm font-medium transition-colors"
+                                >
+                                    <Trash className="w-4 h-4 mr-2" />
+                                    Supprimer cet engin
+                                </button>
+                            )}
+                        </div>
+
                         <button
                             type="submit"
                             className="flex items-center px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105"

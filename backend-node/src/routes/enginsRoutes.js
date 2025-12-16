@@ -14,4 +14,7 @@ router.post('/', EnginsController.createEngin);
 // PATCH /api/engins/:id (Mise à jour)
 router.patch('/:id', EnginsController.updateEngin);
 
+// DELETE /api/engins/:id (Suppression)
+router.delete('/:id', EnginsController.deleteEngin);
+
 module.exports = router;

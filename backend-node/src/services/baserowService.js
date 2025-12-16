@@ -48,6 +48,17 @@ const BaserowService = {
         }
     },
 
+    // Supprimer une ligne
+    deleteRow: async (tableId, rowId) => {
+        try {
+            await baserowClient.delete(`/database/rows/table/${tableId}/${rowId}/`);
+            return { success: true };
+        } catch (error) {
+            console.error(`Erreur Delete Baserow (Table ${tableId}, Row ${rowId}):`, error.response?.data || error.message);
+            throw error;
+        }
+    },
+
     // Upload de fichier vers Baserow
     uploadFile: async (fileBuffer, fileName) => {
         try {

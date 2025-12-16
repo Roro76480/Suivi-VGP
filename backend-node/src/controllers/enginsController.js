@@ -171,6 +171,18 @@ const EnginsController = {
 
     triggerValidationVGP: async (req, res) => {
         res.status(501).json({ message: "Not implemented yet" });
+    },
+
+    deleteEngin: async (req, res) => {
+        try {
+            const { id } = req.params;
+            console.log(`[DELETE] Request Delete Engin ID: ${id}`);
+            await BaserowService.deleteRow(TABLE_ENGINS_ID, id);
+            res.json({ message: "Engin supprimé avec succès" });
+        } catch (error) {
+            console.error(`[DELETE ERROR] Engin ID ${req.params.id}:`, error.message);
+            res.status(500).json({ message: "Erreur suppression engin", error: error.message });
+        }
     }
 };
 
