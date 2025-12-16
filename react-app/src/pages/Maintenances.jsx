@@ -97,7 +97,37 @@ const Maintenances = () => {
             </div>
 
             {/* --- SECTION IMPRESSION SPECIFIQUE --- */}
-            <div className="hidden print:block print:w-full print:p-8 print:bg-white">
+            {/* On utilise un Portal ou une technique CSS pure. Ici technique CSS "position absolute" */}
+            <style>{`
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    #printable-section, #printable-section * {
+                        visibility: visible;
+                    }
+                    #printable-section {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                        background: white;
+                        padding: 20px;
+                    }
+                    /* Force le reset des conteneurs scrollables du Layout */
+                    html, body, #root, main {
+                        overflow: visible !important;
+                        height: auto !important;
+                    }
+                    /* Gestion des Sauts de Page */
+                    .page-break { 
+                        page-break-inside: avoid;
+                        break-inside: avoid; 
+                    }
+                }
+            `}</style>
+
+            <div id="printable-section" className="hidden print:block print:w-full print:p-8 print:bg-white">
                 <div className="mb-8 border-b border-gray-900 pb-4">
                     <h1 className="text-3xl font-bold text-gray-900 uppercase tracking-wide">Rapport de Maintenance Corrective</h1>
                     <div className="flex justify-between items-end mt-4">
@@ -111,7 +141,7 @@ const Maintenances = () => {
                         displayedEngins
                             .filter(e => selectedIds.includes(e.id))
                             .map(engin => (
-                                <div key={engin.id} className="border border-gray-300 rounded-lg p-6 break-inside-avoid shadow-sm bg-white">
+                                <div key={engin.id} className="border border-gray-300 rounded-lg p-6 page-break shadow-sm bg-white mb-6">
                                     <div className="flex justify-between items-start mb-4 border-b border-gray-100 pb-2">
                                         <div>
                                             <h2 className="text-xl font-bold text-gray-800">{engin.Name}</h2>
