@@ -5,8 +5,7 @@ const Sidebar = ({ isOpen, closeMenu }) => {
     const location = useLocation();
 
     const menuItems = [
-        { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-        { path: '/engins', icon: Truck, label: 'Engins' },
+        { path: '/', icon: Truck, label: 'Parc Matériel' },
         { path: '/gestion', icon: Settings, label: 'Gestion VGP' },
         { path: '/maintenances', icon: FileText, label: 'Suivi Maintenances' },
     ];
