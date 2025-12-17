@@ -17,7 +17,9 @@ const GestionVGP = () => {
         'Rapport VGP': null, // URL ou Array
         Photo: null, // URL ou Array
         Document: null, // URL ou Array
-        Note: '' // Champ A corriger
+        Note: '', // Champ A corriger
+        'Validité VGP': '',
+        'Gestion VGP': ''
     });
 
     useEffect(() => {
@@ -37,7 +39,7 @@ const GestionVGP = () => {
         if (enginId === 'new') {
             setIsCreating(true);
             setSelectedEngin(null);
-            setFormData({ Name: '', Statut: '', 'Due Date': '', 'Rapport VGP': [], Photo: [], Document: [], Note: '' });
+            setFormData({ Name: '', Statut: '', 'Due Date': '', 'Rapport VGP': [], Photo: [], Document: [], Note: '', 'Validité VGP': '', 'Gestion VGP': '' });
             return;
         }
 
@@ -48,12 +50,14 @@ const GestionVGP = () => {
             // Map data to form
             setFormData({
                 Name: engin.Name,
-                Statut: typeof engin.Statut === 'object' ? engin.Statut?.value : engin.Statut,
+                Statut: (typeof engin.Statut === 'object' ? engin.Statut?.value : engin.Statut) || '',
                 'Due Date': engin['Due Date'] || '',
                 'Rapport VGP': engin['Rapport VGP'] || [],
                 Photo: engin.Photo || [],
                 Document: engin.Document || [],
-                Note: engin.Note || engin.Notes || ''
+                Note: engin.Note || engin.Notes || '',
+                'Validité VGP': (typeof engin['Validité VGP'] === 'object' ? engin['Validité VGP']?.value : engin['Validité VGP']) || '',
+                'Gestion VGP': (typeof engin['Gestion VGP'] === 'object' ? engin['Gestion VGP']?.value : engin['Gestion VGP']) || ''
             });
         }
     };
@@ -108,7 +112,9 @@ const GestionVGP = () => {
                 Photo: formData.Photo,
                 // Correction : Baserow utilise souvent 'Notes' au pluriel. On envoie les deux par sécurité ou on cible Notes.
                 Notes: formData.Note,
-                Note: formData.Note
+                Note: formData.Note,
+                'Validité VGP': formData['Validité VGP'],
+                'Gestion VGP': formData['Gestion VGP']
                 // 'Document': formData.Document // Ajouter si colonne existe
             };
 
@@ -125,7 +131,7 @@ const GestionVGP = () => {
             loadEngins(); // Reload list
             if (isCreating) {
                 setIsCreating(false);
-                setFormData({ Name: '', Statut: '', 'Due Date': '', 'Rapport VGP': [], Photo: [], Note: '' });
+                setFormData({ Name: '', Statut: '', 'Due Date': '', 'Rapport VGP': [], Photo: [], Note: '', 'Validité VGP': '', 'Gestion VGP': '' });
             }
         } catch (err) {
             console.error(err);
@@ -153,7 +159,7 @@ const GestionVGP = () => {
 
                 setMessage({ type: 'success', text: 'Engin supprimé avec succès.' });
                 setSelectedEngin(null);
-                setFormData({ Name: '', Statut: '', 'Due Date': '', 'Rapport VGP': [], Photo: [], Note: '' });
+                setFormData({ Name: '', Statut: '', 'Due Date': '', 'Rapport VGP': [], Photo: [], Note: '', 'Validité VGP': '', 'Gestion VGP': '' });
                 loadEngins(); // Recharger la liste
             } catch (err) {
                 console.error(err);
@@ -321,6 +327,38 @@ const GestionVGP = () => {
                                 {!engins.some(e => (typeof e.Statut === 'object' ? e.Statut?.value : e.Statut) === "Avec écarts") && <option value="Avec écarts">Avec écarts</option>}
                             </select>
                             <p className="text-xs text-gray-500 mt-1">Options récupérées directement de vos engins existants.</p>
+                        </div>
+
+                        {/* Gestion VGP (Dynamique) */}
+                        <div className="col-span-2 md:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Gestion VGP</label>
+                            <select
+                                name="Gestion VGP"
+                                value={formData['Gestion VGP']}
+                                onChange={handleInputChange}
+                                className="w-full rounded-lg border-gray-300 p-3 bg-white focus:ring-2 focus:ring-blue-500 border outline-none"
+                            >
+                                <option value="">Sélectionner...</option>
+                                {[...new Set(engins.map(e => typeof e['Gestion VGP'] === 'object' ? e['Gestion VGP']?.value : e['Gestion VGP']).filter(Boolean))].sort().map(val => (
+                                    <option key={val} value={val}>{val}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Validité VGP (Dynamique) */}
+                        <div className="col-span-2 md:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Validité VGP</label>
+                            <select
+                                name="Validité VGP"
+                                value={formData['Validité VGP']}
+                                onChange={handleInputChange}
+                                className="w-full rounded-lg border-gray-300 p-3 bg-white focus:ring-2 focus:ring-blue-500 border outline-none"
+                            >
+                                <option value="">Sélectionner...</option>
+                                {[...new Set(engins.map(e => typeof e['Validité VGP'] === 'object' ? e['Validité VGP']?.value : e['Validité VGP']).filter(Boolean))].sort().map(val => (
+                                    <option key={val} value={val}>{val}</option>
+                                ))}
+                            </select>
                         </div>
 
                         {/* Due Date */}
