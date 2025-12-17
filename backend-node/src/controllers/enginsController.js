@@ -90,7 +90,13 @@ const EnginsController = {
                         }
                     }
 
-                    // 2. Si rien trouvé manuellement ET que ce n'est pas un cas masqué explicitement
+                    // 2. Règle Générale : Masquer les heures pour les Palonniers (et autres types sans heures moteur)
+                    // Cela permet de gérer les NOUVEAUX engins créés via l'appli sans les mapper manuellement
+                    if (matchedHours !== null && enginName.toLowerCase().includes("palonnier")) {
+                        matchedHours = null;
+                    }
+
+                    // 3. Si rien trouvé manuellement ET que ce n'est pas un cas masqué explicitement
                     if (matchedHours !== null && matchedHours.length === 0) {
                         const normalizedEnginName = enginName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
