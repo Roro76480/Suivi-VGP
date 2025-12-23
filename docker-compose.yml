@@ -23,6 +23,7 @@ services:
     networks:
       - coolify
       - default
+      - yk44s84scgocwk4c4880gks0
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
@@ -72,4 +73,6 @@ volumes:
 
 networks:
   coolify:
+    external: true
+  yk44s84scgocwk4c4880gks0:
     external: true
