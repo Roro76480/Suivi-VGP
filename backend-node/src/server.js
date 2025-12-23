@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+const { initDatabase } = require('./config/postgresDb');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -15,15 +17,28 @@ app.get('/', (req, res) => {
     res.send('API Suivi-VGP Running');
 });
 
-// Import Routes (Structure placeholder)
+// Import Routes
+const authRoutes = require('./routes/authRoutes');
 const enginsRoutes = require('./routes/enginsRoutes');
 const filesRoutes = require('./routes/filesRoutes');
 const proxyRoutes = require('./routes/proxyRoutes');
 
+app.use('/api/auth', authRoutes);
 app.use('/api/engins', enginsRoutes);
 app.use('/api/files', filesRoutes);
 app.use('/api/proxy', proxyRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// Initialize database and start server
+const startServer = async () => {
+    try {
+        await initDatabase();
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    } catch (err) {
+        console.error('Failed to start server:', err);
+        process.exit(1);
+    }
+};
+
+startServer();
