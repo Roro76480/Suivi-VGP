@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Engins from './pages/Engins';
 import GestionVGP from './pages/GestionVGP';
 import Maintenances from './pages/Maintenances';
+import ApparauxLevage from './pages/ApparauxLevage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="gestion" element={<GestionVGP />} />
             <Route path="maintenances" element={<Maintenances />} />
           </Route>
+          <Route path="/apparaux-levage" element={<ApparauxLevage />} />
         </Routes>
       </Router>
     </AuthProvider>

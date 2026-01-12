@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Truck, Settings, FileText, X } from 'lucide-react';
+import { LayoutDashboard, Truck, Settings, FileText, X, Link2 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, closeMenu }) => {
     const location = useLocation();
@@ -8,6 +8,7 @@ const Sidebar = ({ isOpen, closeMenu }) => {
         { path: '/', icon: Truck, label: 'Parc Matériel' },
         { path: '/gestion', icon: Settings, label: 'Gestion VGP' },
         { path: '/maintenances', icon: FileText, label: 'Suivi Maintenances' },
+        { path: '/apparaux-levage', icon: Link2, label: 'Apparaux de levage' },
     ];
 
     return (
