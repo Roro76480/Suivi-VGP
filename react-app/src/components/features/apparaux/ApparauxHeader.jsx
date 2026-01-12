@@ -63,6 +63,7 @@ const ApparauxHeader = ({ onValidationComplete }) => {
                     <ol className="list-decimal list-inside space-y-1">
                         <li>Uploader les 5 rapports PDF (ci-dessous)</li>
                         <li className="flex items-center flex-wrap gap-1">
+                            <span className="mr-1">2.</span>
                             Cocher "VGP faite" dans chaque onglet → Rapport Global VGP →
                             <Edit2 className="w-4 h-4 inline mx-1" />
                             →
