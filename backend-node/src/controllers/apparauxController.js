@@ -6,15 +6,15 @@ const BaserowService = require('../services/baserowService');
 
 // Configuration des tables depuis les variables d'environnement
 const TABLES_CONFIG = {
-    manilles: {
-        id: process.env.BASEROW_TABLE_MANILLES,
-        nom: 'Manilles',
-        ligne00Name: '00 RAPPORT VGP MANILLES'
-    },
     elingues: {
         id: process.env.BASEROW_TABLE_ELINGUES,
         nom: 'Élingues',
         ligne00Name: '00 RAPPORT VGP ÉLINGUES'
+    },
+    manilles: {
+        id: process.env.BASEROW_TABLE_MANILLES,
+        nom: 'Manilles',
+        ligne00Name: '00 RAPPORT VGP MANILLES'
     },
     mailles: {
         id: process.env.BASEROW_TABLE_MAILLES_DE_TETE,
@@ -35,8 +35,8 @@ const TABLES_CONFIG = {
 
 // Configuration des webhooks n8n depuis les variables d'environnement
 const WEBHOOKS_CONFIG = {
-    manilles: process.env.N8N_WEBHOOK_MANILLES,
     elingues: process.env.N8N_WEBHOOK_ELINGUES,
+    manilles: process.env.N8N_WEBHOOK_MANILLES,
     mailles: process.env.N8N_WEBHOOK_MAILLES,
     emerillons: process.env.N8N_WEBHOOK_EMERILLONS,
     crochets: process.env.N8N_WEBHOOK_CROCHETS

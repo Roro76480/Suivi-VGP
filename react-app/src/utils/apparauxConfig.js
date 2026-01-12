@@ -5,15 +5,6 @@
 
 export const SECTIONS_CONFIG = [
     {
-        id: 'manilles',
-        nom: 'Manilles',
-        emoji: '🔗',
-        tableEnvKey: 'VITE_BASEROW_TABLE_MANILLES',
-        webhookEnvKey: 'VITE_N8N_WEBHOOK_MANILLES',
-        ligne00Name: '00 RAPPORT VGP MANILLES',
-        colonnesSpecifiques: ['Name', 'C.M.U. (T)', 'Type', 'Due Date', 'Statut VGP']
-    },
-    {
         id: 'elingues',
         nom: 'Élingues',
         emoji: '🪢',
@@ -21,6 +12,15 @@ export const SECTIONS_CONFIG = [
         webhookEnvKey: 'VITE_N8N_WEBHOOK_ELINGUES',
         ligne00Name: '00 RAPPORT VGP ÉLINGUES',
         colonnesSpecifiques: ['Name', 'C.M.U. (T)', 'Type', 'Longueur (m)', 'Due Date', 'Statut VGP']
+    },
+    {
+        id: 'manilles',
+        nom: 'Manilles',
+        emoji: '🔗',
+        tableEnvKey: 'VITE_BASEROW_TABLE_MANILLES',
+        webhookEnvKey: 'VITE_N8N_WEBHOOK_MANILLES',
+        ligne00Name: '00 RAPPORT VGP MANILLES',
+        colonnesSpecifiques: ['Name', 'C.M.U. (T)', 'Type', 'Due Date', 'Statut VGP']
     },
     {
         id: 'mailles',
