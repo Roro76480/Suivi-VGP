@@ -22,8 +22,8 @@ function App() {
             <Route index element={<Engins />} />
             <Route path="gestion" element={<GestionVGP />} />
             <Route path="maintenances" element={<Maintenances />} />
+            <Route path="apparaux-levage" element={<ApparauxLevage />} />
           </Route>
-          <Route path="/apparaux-levage" element={<ApparauxLevage />} />
         </Routes>
       </Router>
     </AuthProvider>
