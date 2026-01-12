@@ -164,7 +164,7 @@ const Login = () => {
 
                 {/* Footer */}
                 <p className="text-center text-sm text-gray-500 mt-8">
-                    © {new Date().getFullYear()} Suivi VGP. Tous droits réservés.
+                    © {new Date().getFullYear()} evolia digital. Tous droits réservés.
                 </p>
             </div>
         </div>
