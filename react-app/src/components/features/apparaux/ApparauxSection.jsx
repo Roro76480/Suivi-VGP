@@ -129,12 +129,13 @@ const ApparauxSection = ({ section }) => {
         // Filtrer les données par statut : "valide", "A renouveler", "A remmettre en état"
         const filteredData = inventaire.filter(item => {
             const statutVGP = item['Statut VGP'];
-            const statutText = statutVGP ? (typeof statutVGP === 'object' ? statutVGP.value : statutVGP).toLowerCase() : '';
+            const statutText = statutVGP ? (typeof statutVGP === 'object' ? statutVGP.value : statutVGP).toLowerCase().trim() : '';
 
-            return statutText.includes('valide') ||
+            // Précis pour "valide" pour ne pas matcher "non valide"
+            return (statutText === 'valide') ||
                 statutText.includes('renouveler') ||
                 statutText.includes('remettre') ||
-                statutText.includes('remmettre'); // Gérer la faute de frappe possible
+                statutText.includes('remmettre');
         });
 
         if (filteredData.length === 0) {
