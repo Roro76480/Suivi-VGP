@@ -126,8 +126,24 @@ const ApparauxSection = ({ section }) => {
     };
 
     const handlePrintInventory = () => {
+        // Filtrer les données par statut : "valide", "A renouveler", "A remmettre en état"
+        const filteredData = inventaire.filter(item => {
+            const statutVGP = item['Statut VGP'];
+            const statutText = statutVGP ? (typeof statutVGP === 'object' ? statutVGP.value : statutVGP).toLowerCase() : '';
+
+            return statutText.includes('valide') ||
+                statutText.includes('renouveler') ||
+                statutText.includes('remettre') ||
+                statutText.includes('remmettre'); // Gérer la faute de frappe possible
+        });
+
+        if (filteredData.length === 0) {
+            alert("Aucun élément avec les statuts requis (Valide, À renouveler, À remettre en état) n'a été trouvé.");
+            return;
+        }
+
         // Trier les données: Type → Longueur → CMU → Name
-        const sortedData = [...inventaire].sort((a, b) => {
+        const sortedData = [...filteredData].sort((a, b) => {
             // Helper pour extraire la valeur
             const getValue = (item, key) => {
                 const val = item[key];
