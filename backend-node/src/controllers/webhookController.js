@@ -55,6 +55,8 @@ const handleBaserowWebhook = async (req, res) => {
                 const emailData = {
                     name: item.Name || item.name || 'N/A',
                     type: typeof item.Type === 'object' ? item.Type.value : (item.Type || 'N/A'),
+                    cmu: item['C.M.U. (T)'] || 'N/A',
+                    length: item['Longueur (m)'] || null,
                     section: section,
                     previousStatus: oldStatus ? (typeof oldStatus === 'object' ? oldStatus.value : oldStatus) : null,
                     notes: item.Notes || item.notes || null

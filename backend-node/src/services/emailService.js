@@ -22,85 +22,85 @@ const createTransporter = () => {
  * @param {string} data.previousStatus - Statut précédent (optionnel)
  * @param {string} data.notes - Notes associées (optionnel)
  */
+/**
+ * Envoie un email d'alerte lorsqu'un appareil passe en statut "Non valide"
+ * @param {Object} data - Les données de l'appareil
+ */
 const sendNonValideAlert = async (data) => {
-    const { name, type, section, previousStatus, notes } = data;
+    const { name, type, section, length, cmu } = data;
 
     const transporter = createTransporter();
+
+    // Préparation des contenus pour le mail
+    const lengthStr = length ? ` - Longueur: ${length}m` : '';
+    const cmuStr = cmu ? ` - CMU: ${cmu}T` : '';
+
+    const itemDescription = `${section} - ${name} - ${type}${lengthStr}${cmuStr}`;
+    const subjectQuote = `Demande de devis ${section} - ${type}${lengthStr} - CMU ${cmu}T`;
+
+    const bodyQuote = `Bonjour,
+
+Pourriez-vous nous envoyer un devis pour le renouvellement d'un de nos apparaux :
+
+- ${section} - ${type}${lengthStr} - CMU ${cmu}T
+
+Par avance merci.
+
+Cordialement,`;
+
+    // Fonction pour générer le lien mailto
+    const generateMailto = (toEmail) => {
+        const cc = 'cyril.bonamy@katoennatie.com,romain.mace@katoennatie.com';
+        return `mailto:${toEmail}?cc=${cc}&subject=${encodeURIComponent(subjectQuote)}&body=${encodeURIComponent(bodyQuote)}`;
+    };
+
+    const linkMagi = generateMailto('lehavre@magi.fr');
+    const linkANCC = generateMailto('contact@ancclevage.fr');
+    const linkPOL = generateMailto('c.wittier@PO-Levage.fr,contact@po-levage.fr');
 
     const emailContent = {
         from: process.env.EMAIL_FROM || 'Suivi VGP <noreply@example.com>',
         to: process.env.EMAIL_TO_ALERT,
-        subject: `⚠️ Alerte VGP - ${name} passé en NON VALIDE`,
+        subject: `L'apparau de levage "${name}" n'est plus valide`,
         html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background-color: #DC2626; color: white; padding: 20px; text-align: center;">
-                    <h1 style="margin: 0;">⚠️ Alerte Statut VGP</h1>
-                </div>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px;">
+                <p>Bonjour,</p>
+
+                <p>L'apparau de levage : <strong>${itemDescription}</strong> n'est plus valide.</p>
+
+                <p>Envoyer une demande de devis à :</p>
+
+                <ul>
+                    <li style="margin-bottom: 10px;">
+                        Magi levage en cliquant <a href="${linkMagi}" style="color: #2563EB; font-weight: bold; text-decoration: none;">"ICI"</a>
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        ANCC en cliquant <a href="${linkANCC}" style="color: #2563EB; font-weight: bold; text-decoration: none;">"ICI"</a>
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        POL (Porte Océane Levage) en cliquant <a href="${linkPOL}" style="color: #2563EB; font-weight: bold; text-decoration: none;">"ICI"</a>
+                    </li>
+                </ul>
                 
-                <div style="padding: 20px; background-color: #f9fafb; border: 1px solid #e5e7eb;">
-                    <h2 style="color: #DC2626; margin-top: 0;">Un appareil de levage est passé en statut "Non Valide"</h2>
-                    
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr>
-                            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-weight: bold; width: 40%;">Identifiant / Nom</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${name || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Type</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${type || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Section</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${section || 'N/A'}</td>
-                        </tr>
-                        ${previousStatus ? `
-                        <tr>
-                            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Statut précédent</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${previousStatus}</td>
-                        </tr>
-                        ` : ''}
-                        ${notes ? `
-                        <tr>
-                            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Notes</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${notes}</td>
-                        </tr>
-                        ` : ''}
-                        <tr>
-                            <td style="padding: 10px; font-weight: bold;">Date de détection</td>
-                            <td style="padding: 10px;">${new Date().toLocaleString('fr-FR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        })}</td>
-                        </tr>
-                    </table>
-                    
-                    <div style="margin-top: 20px; padding: 15px; background-color: #FEF2F2; border-left: 4px solid #DC2626; border-radius: 4px;">
-                        <strong>Action requise :</strong> Veuillez vérifier cet équipement et prendre les mesures nécessaires.
-                    </div>
-                </div>
+                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
                 
-                <div style="padding: 15px; text-align: center; color: #6b7280; font-size: 12px;">
+                <div style="color: #6b7280; font-size: 12px; text-align: center;">
                     <p>Cet email a été envoyé automatiquement par Suivi VGP.</p>
-                    <p>Ne pas répondre à cet email.</p>
                 </div>
             </div>
         `,
         text: `
-ALERTE VGP - ${name} passé en NON VALIDE
+Bonjour,
 
-Un appareil de levage est passé en statut "Non Valide".
+L'apparau de levage : "${itemDescription}" n'est plus valide.
 
-Identifiant / Nom: ${name || 'N/A'}
-Type: ${type || 'N/A'}
-Section: ${section || 'N/A'}
-${previousStatus ? `Statut précédent: ${previousStatus}` : ''}
-${notes ? `Notes: ${notes}` : ''}
-Date de détection: ${new Date().toLocaleString('fr-FR')}
+Envoyer une demande de devis à :
 
-Action requise : Veuillez vérifier cet équipement et prendre les mesures nécessaires.
+- Magi levage (lehavre@magi.fr)
+- ANCC (contact@ancclevage.fr)
+- POL (c.wittier@PO-Levage.fr)
+
+Sujet du devis : ${subjectQuote}
 
 ---
 Cet email a été envoyé automatiquement par Suivi VGP.
