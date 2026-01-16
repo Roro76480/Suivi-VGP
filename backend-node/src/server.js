@@ -16,6 +16,9 @@ const PORT = process.env.PORT || 5000;
 // Helmet: Secure HTTP headers (XSS, clickjacking, etc.)
 app.use(helmet());
 
+// Trust Proxy (Required for proper IP detection behind Traefik/Nginx)
+app.set('trust proxy', 1);
+
 // CORS: Restrict origins in production
 const corsOptions = {
     origin: process.env.CORS_ORIGIN === '*'
@@ -33,6 +36,7 @@ const limiter = rateLimit({
     max: 100, // Max 100 requests per window per IP
     standardHeaders: true,
     legacyHeaders: false,
+    validate: { xForwardedForHeader: false }, // Suppress warnings as we set trust proxy
     message: { error: 'Trop de requêtes, veuillez réessayer plus tard' }
 });
 app.use('/api/', limiter);
