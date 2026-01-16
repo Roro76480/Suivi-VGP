@@ -65,6 +65,7 @@ const enginsRoutes = require('./routes/enginsRoutes');
 const filesRoutes = require('./routes/filesRoutes');
 const proxyRoutes = require('./routes/proxyRoutes');
 const apparauxRoutes = require('./routes/apparauxRoutes');
+const webhookRoutes = require('./routes/webhookRoutes');
 
 // Apply stricter rate limit to auth routes
 app.use('/api/auth', authLimiter, authRoutes);
@@ -72,6 +73,7 @@ app.use('/api/engins', enginsRoutes);
 app.use('/api/files', filesRoutes);
 app.use('/api/proxy', proxyRoutes);
 app.use('/api/apparaux', apparauxRoutes);
+app.use('/api/webhook', webhookRoutes);
 
 // ===========================================
 // ERROR HANDLING
