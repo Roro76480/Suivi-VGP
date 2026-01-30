@@ -143,34 +143,33 @@ const ApparauxSection = ({ section }) => {
             return;
         }
 
-        // Trier les données: Type → Longueur → CMU → Name
+        // Trier les données par Identifiant / Nom en priorité
         const sortedData = [...filteredData].sort((a, b) => {
-            // Helper pour extraire la valeur
             const getValue = (item, key) => {
                 const val = item[key];
                 if (typeof val === 'object' && val !== null) return val.value || '';
                 return val || '';
             };
 
-            // 1. Trier par Type
+            // 1. Trier par Identifiant / Nom (Name)
+            const nameA = getValue(a, 'Name').toLowerCase();
+            const nameB = getValue(b, 'Name').toLowerCase();
+            if (nameA !== nameB) return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
+
+            // 2. Trier par Type (secondaire)
             const typeA = getValue(a, 'Type').toLowerCase();
             const typeB = getValue(b, 'Type').toLowerCase();
             if (typeA !== typeB) return typeA.localeCompare(typeB);
 
-            // 2. Trier par Longueur (numérique)
+            // 3. Trier par Longueur (numérique)
             const longueurA = parseFloat(a['Longueur (m)']) || 0;
             const longueurB = parseFloat(b['Longueur (m)']) || 0;
             if (longueurA !== longueurB) return longueurA - longueurB;
 
-            // 3. Trier par CMU (numérique)
+            // 4. Trier par CMU (numérique)
             const cmuA = parseFloat(a['C.M.U. (T)']) || 0;
             const cmuB = parseFloat(b['C.M.U. (T)']) || 0;
-            if (cmuA !== cmuB) return cmuA - cmuB;
-
-            // 4. Trier par Name
-            const nameA = getValue(a, 'Name').toLowerCase();
-            const nameB = getValue(b, 'Name').toLowerCase();
-            return nameA.localeCompare(nameB);
+            return cmuA - cmuB;
         });
 
         // Vérifier si la colonne Longueur contient des valeurs
