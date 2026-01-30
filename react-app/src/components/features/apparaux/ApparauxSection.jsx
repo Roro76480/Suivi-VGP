@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getSectionData, updateRow, uploadFile, createItem } from '../../../services/baserowService';
 import { validerSection } from '../../../services/n8nService';
 import ApparauxTable from './ApparauxTable';
@@ -39,30 +39,27 @@ const ApparauxSection = ({ section }) => {
         setSortConfig({ key, direction });
     };
 
-    const sortedInventaire = [...filteredInventaire].sort((a, b) => {
-        if (!sortConfig.key) return 0;
+    const sortedInventaire = useMemo(() => {
+        return [...filteredInventaire].sort((a, b) => {
+            if (!sortConfig.key) return 0;
 
-        let aValue = a[sortConfig.key];
-        let bValue = b[sortConfig.key];
+            let aValue = a[sortConfig.key];
+            let bValue = b[sortConfig.key];
 
-        // Gestion des objets complexes (ex: { value: '...', color: '...' })
-        if (typeof aValue === 'object' && aValue !== null) aValue = aValue.value || '';
-        if (typeof bValue === 'object' && bValue !== null) bValue = bValue.value || '';
+            // Gestion des objets complexes (ex: { value: '...', color: '...' })
+            if (typeof aValue === 'object' && aValue !== null) aValue = aValue.value || '';
+            if (typeof bValue === 'object' && bValue !== null) bValue = bValue.value || '';
 
-        // Gestion des valeurs null/undefined
-        if (!aValue) aValue = '';
-        if (!bValue) bValue = '';
+            // Gestion des valeurs null/undefined
+            if (!aValue) aValue = '';
+            if (!bValue) bValue = '';
 
-        // Si on trie par "Name", on utilise le tri numérique pour que "ID-2" soit avant "ID-10"
-        if (sortConfig.key === 'Name') {
-            const comp = String(aValue).localeCompare(String(bValue), undefined, { numeric: true, sensitivity: 'base' });
-            return sortConfig.direction === 'ascending' ? comp : -comp;
-        }
-
-        if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
-        return 0;
-    });
+            // Comparaison standard (comme dans l'ancienne version du tableau qui plaisait à l'utilisateur)
+            if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
+            if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
+            return 0;
+        });
+    }, [filteredInventaire, sortConfig]);
 
     useEffect(() => {
         loadData();
