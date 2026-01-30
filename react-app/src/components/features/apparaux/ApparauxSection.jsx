@@ -14,6 +14,7 @@ const ApparauxSection = ({ section }) => {
     const [itemModal, setItemModal] = useState({ open: false, data: null });
     const [validating, setValidating] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [sortConfig, setSortConfig] = useState({ key: 'Name', direction: 'ascending' });
 
     const filteredInventaire = inventaire.filter(item => {
         if (!searchTerm) return true;
@@ -27,6 +28,40 @@ const ApparauxSection = ({ section }) => {
             (item.Notes && item.Notes.toLowerCase().includes(searchLower)) ||
             statusStr.toLowerCase().includes(searchLower)
         );
+    });
+
+    // Gestion du tri au niveau de la section pour synchroniser avec l'impression
+    const handleSort = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const sortedInventaire = [...filteredInventaire].sort((a, b) => {
+        if (!sortConfig.key) return 0;
+
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+
+        // Gestion des objets complexes (ex: { value: '...', color: '...' })
+        if (typeof aValue === 'object' && aValue !== null) aValue = aValue.value || '';
+        if (typeof bValue === 'object' && bValue !== null) bValue = bValue.value || '';
+
+        // Gestion des valeurs null/undefined
+        if (!aValue) aValue = '';
+        if (!bValue) bValue = '';
+
+        // Si on trie par "Name", on utilise le tri numérique pour que "ID-2" soit avant "ID-10"
+        if (sortConfig.key === 'Name') {
+            const comp = String(aValue).localeCompare(String(bValue), undefined, { numeric: true, sensitivity: 'base' });
+            return sortConfig.direction === 'ascending' ? comp : -comp;
+        }
+
+        if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
+        return 0;
     });
 
     useEffect(() => {
@@ -126,8 +161,8 @@ const ApparauxSection = ({ section }) => {
     };
 
     const handlePrintInventory = () => {
-        // Filtrer les données par statut : "valide", "A renouveler", "A remmettre en état"
-        const filteredData = inventaire.filter(item => {
+        // Utiliser la liste DÉJÀ triée (sortedInventaire) et filtrer par statut pour l'impression
+        const printData = sortedInventaire.filter(item => {
             const statutVGP = item['Statut VGP'];
             const statutText = statutVGP ? (typeof statutVGP === 'object' ? statutVGP.value : statutVGP).toLowerCase().trim() : '';
 
@@ -138,42 +173,13 @@ const ApparauxSection = ({ section }) => {
                 statutText.includes('remmettre');
         });
 
-        if (filteredData.length === 0) {
+        if (printData.length === 0) {
             alert("Aucun élément avec les statuts requis (Valide, À renouveler, À remettre en état) n'a été trouvé.");
             return;
         }
 
-        // Trier les données par Identifiant / Nom en priorité
-        const sortedData = [...filteredData].sort((a, b) => {
-            const getValue = (item, key) => {
-                const val = item[key];
-                if (typeof val === 'object' && val !== null) return val.value || '';
-                return val || '';
-            };
-
-            // 1. Trier par Identifiant / Nom (Name)
-            const nameA = getValue(a, 'Name').toLowerCase();
-            const nameB = getValue(b, 'Name').toLowerCase();
-            if (nameA !== nameB) return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
-
-            // 2. Trier par Type (secondaire)
-            const typeA = getValue(a, 'Type').toLowerCase();
-            const typeB = getValue(b, 'Type').toLowerCase();
-            if (typeA !== typeB) return typeA.localeCompare(typeB);
-
-            // 3. Trier par Longueur (numérique)
-            const longueurA = parseFloat(a['Longueur (m)']) || 0;
-            const longueurB = parseFloat(b['Longueur (m)']) || 0;
-            if (longueurA !== longueurB) return longueurA - longueurB;
-
-            // 4. Trier par CMU (numérique)
-            const cmuA = parseFloat(a['C.M.U. (T)']) || 0;
-            const cmuB = parseFloat(b['C.M.U. (T)']) || 0;
-            return cmuA - cmuB;
-        });
-
         // Vérifier si la colonne Longueur contient des valeurs
-        const hasLongueur = sortedData.some(item => item['Longueur (m)']);
+        const hasLongueur = printData.some(item => item['Longueur (m)']);
 
         // Générer le HTML pour l'impression
         const printWindow = window.open('', '_blank');
@@ -263,7 +269,7 @@ const ApparauxSection = ({ section }) => {
             hour: '2-digit',
             minute: '2-digit'
         })}</p>
-                <p><strong>Nombre total d'éléments :</strong> ${sortedData.length}</p>
+                <p><strong>Nombre total d'éléments :</strong> ${printData.length}</p>
                 
                 <table>
                     <thead>
@@ -277,7 +283,7 @@ const ApparauxSection = ({ section }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        ${sortedData.map(item => {
+                        ${printData.map(item => {
             const type = typeof item.Type === 'object' ? item.Type.value : item.Type || '-';
             const longueur = item['Longueur (m)'] || '-';
             const cmu = item['C.M.U. (T)'] || '-';
@@ -424,8 +430,10 @@ const ApparauxSection = ({ section }) => {
                 </div>
 
                 <ApparauxTable
-                    data={filteredInventaire}
+                    data={sortedInventaire}
                     onEdit={(item) => setItemModal({ open: true, data: item })}
+                    sortConfig={sortConfig}
+                    onSort={handleSort}
                 />
             </div>
 
