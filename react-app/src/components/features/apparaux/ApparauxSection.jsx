@@ -161,22 +161,14 @@ const ApparauxSection = ({ section }) => {
     };
 
     const handlePrintInventory = () => {
-        // Utiliser la liste DÉJÀ triée (sortedInventaire) et filtrer par statut pour l'impression
-        const printData = sortedInventaire.filter(item => {
-            const statutVGP = item['Statut VGP'];
-            const statutText = statutVGP ? (typeof statutVGP === 'object' ? statutVGP.value : statutVGP).toLowerCase().trim() : '';
-
-            // Précis pour "valide" pour ne pas matcher "non valide"
-            return (statutText === 'valide') ||
-                statutText.includes('renouveler') ||
-                statutText.includes('remettre') ||
-                statutText.includes('remmettre');
-        });
+        // Imprimer exactement ce qui est visible dans le tableau (tri + recherche)
+        const printData = sortedInventaire;
 
         if (printData.length === 0) {
-            alert("Aucun élément avec les statuts requis (Valide, À renouveler, À remettre en état) n'a été trouvé.");
+            alert("Aucun élément à imprimer.");
             return;
         }
+
 
         // Vérifier si la colonne Longueur contient des valeurs
         const hasLongueur = printData.some(item => item['Longueur (m)']);
